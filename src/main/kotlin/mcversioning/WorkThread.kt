@@ -33,7 +33,7 @@ class WorkThread(
         val httpClient = HttpClient(options)
         val currentVersionFile = progDir + options.verionFile
 
-        val currentVersion = if (currentVersionFile.exists) currentVersionFile.content else "1"
+        val currentVersion = if (currentVersionFile.exists) currentVersionFile.content else "none"
         val newestVersion = httpClient.fetchTextMutiple(options.server)
 
         LogSys.info("current version: $currentVersion, newest Version: $newestVersion")
@@ -52,7 +52,7 @@ class WorkThread(
             val position = allVersions.indexOf(currentVersion)
 
             // 是否是合法的版本号
-            if (currentVersion in allVersions)
+            if (currentVersion in allVersions || currentVersion == "none")
             {
                 val missingVersions = allVersions.drop(if (position == -1) 0 else position + 1)
 
