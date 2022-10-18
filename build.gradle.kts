@@ -37,7 +37,7 @@ tasks.withType<ShadowJar> {
     manifest {
         attributes("Version" to archiveVersion.get())
         attributes("Git-Commit" to (gitCommitSha ?: ""))
-        attributes("Main-Class" to "McVersioningClient")
+        attributes("Main-Class" to "mcversioning.McVersioningMain")
     }
 
     archiveClassifier.set("")
