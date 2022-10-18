@@ -47,10 +47,10 @@ class McVersioningMain
 
             // 初始化日志系统
             if (enableLogFile)
-                LogSys.addHandler(FileHandler(LogSys, progDir + (if (graphicsMode) "balloon_update.log" else "balloon_update.txt")))
+                LogSys.addHandler(FileHandler(LogSys, progDir + (if (graphicsMode) "mc-versioning.log" else "mc-versioning.txt")))
             LogSys.addHandler(ConsoleHandler(LogSys, if (EnvironmentUtils.isPackaged) (if (graphicsMode) LogSys.LogLevel.DEBUG else LogSys.LogLevel.INFO) else LogSys.LogLevel.INFO))
             if (!hasStandaloneProgress)
-                LogSys.openRangedTag("BalloonUpdate")
+                LogSys.openRangedTag("McVersioning")
 
             LogSys.info("GraphicsMode:         $graphicsMode")
             LogSys.info("Standalone:           $hasStandaloneProgress")
