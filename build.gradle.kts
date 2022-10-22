@@ -22,8 +22,8 @@ dependencies {
     implementation("org.json:json:20220924")
     implementation("org.yaml:snakeyaml:1.33")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("com.formdev:flatlaf:2.5")
-    implementation("com.formdev:flatlaf-intellij-themes:2.5")
+    implementation("com.formdev:flatlaf:2.6")
+    implementation("com.formdev:flatlaf-intellij-themes:2.6")
     testImplementation(kotlin("test"))
 }
 
