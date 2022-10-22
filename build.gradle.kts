@@ -38,6 +38,7 @@ tasks.withType<ShadowJar> {
         attributes("Version" to archiveVersion.get())
         attributes("Git-Commit" to (gitCommitSha ?: ""))
         attributes("Main-Class" to "mcversioning.McVersioningMain")
+        attributes("Premain-Class" to "mcversioning.McVersioningMain")
     }
 
     archiveClassifier.set("")
