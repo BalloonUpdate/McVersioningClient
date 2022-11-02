@@ -121,18 +121,18 @@ class WorkThread(
 
             if(shouldDisplay)
             {
-                if (!options.autoExit)
+                if (hasUpdate)
                 {
-                    if (hasUpdate)
+                    // 显示所有更新记录
+                    for ((index, vr) in versionRecords.withIndex())
                     {
-                        // 显示所有更新记录
-                        for ((index, vr) in versionRecords.withIndex())
-                        {
-                            val title = vr.first + " (${index + 1} / ${versionRecords.size})"
-                            val content = vr.second.changeLogs.joinToString("\n").trim().ifEmpty { "该版本暂无更新日志" }
-                            JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
-                        }
-                    } else {
+                        val title = vr.first + " (${index + 1} / ${versionRecords.size})"
+                        val content = vr.second.changeLogs.joinToString("\n").trim().ifEmpty { "该版本暂无更新日志" }
+                        JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
+                    }
+                } else {
+                    if (!options.autoExit)
+                    {
                         val title = Localization[LangNodes.finish_message_title_no_update]
                         val content = Localization[LangNodes.finish_message_content_no_update]
                         JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
