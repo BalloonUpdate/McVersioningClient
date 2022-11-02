@@ -7,6 +7,7 @@ import mcversioning.localization.LangNodes
 import mcversioning.localization.Localization
 import mcversioning.logging.LogSys
 import mcversioning.util.*
+import java.awt.Desktop
 import java.io.InterruptedIOException
 import javax.swing.JOptionPane
 
@@ -35,6 +36,7 @@ class WorkThread(
 
         val currentVersion = if (currentVersionFile.exists) currentVersionFile.content else "none"
         val newestVersion = httpClient.fetchTextMutiple(options.server)
+        var versionRecords: List<Pair<String, VersionRecord>> = listOf()
 
         LogSys.info("current version: $currentVersion, newest Version: $newestVersion")
 
@@ -59,9 +61,8 @@ class WorkThread(
                 LogSys.info("missing versions: $missingVersions, all versions: $allVersions")
 
                 // 获取落后的版本的元数据
-                val versionRecords = missingVersions
-                    .map { version -> httpClient.fetchJsonMutiple(getMultipleUrls("/v-$version.json"), "版本记录文件 $version", true).first!! }
-                    .map { VersionRecord(it) }
+                versionRecords = missingVersions
+                    .map { version -> version to VersionRecord(httpClient.fetchJsonMutiple(getMultipleUrls("/v-$version.json"), "版本记录文件 $version", true).first!!) }
 
                 if (versionRecords.isNotEmpty())
                 {
@@ -70,9 +71,9 @@ class WorkThread(
                     for (record in versionRecords)
                     {
                         if (versionRecord == null)
-                            versionRecord = record
+                            versionRecord = record.second
                         else
-                            versionRecord.apply(record)
+                            versionRecord.apply(record.second)
                     }
 
                     val diff = versionRecord!!
@@ -106,6 +107,8 @@ class WorkThread(
                     currentVersionFile.content = newestVersion
                 }
             } else {
+                if (Desktop.isDesktopSupported())
+                    JOptionPane.showMessageDialog(null, "当前客户端版本号不在服务端的版本号列表里，可能是一个无效的版本号。因此无法确定版本前后关系，更新失败！", "", JOptionPane.ERROR_MESSAGE)
                 LogSys.warn("当前客户端版本号不在服务端的版本号列表里，可能是一个无效的版本号。因此无法确定版本前后关系，更新失败！")
             }
         }
@@ -113,13 +116,28 @@ class WorkThread(
         // 显示更新小结
         if(window != null)
         {
-            if(!(options.quietMode && _diff.newFiles.isEmpty()) && !options.autoExit)
+            val shouldDisplay = !options.quietMode || _diff.newFiles.isNotEmpty()
+            val hasUpdate = _diff.newFiles.isNotEmpty()
+
+            if(shouldDisplay)
             {
-                val news = _diff.newFiles
-                val hasUpdate = news.isNotEmpty()
-                val title = if(hasUpdate) Localization[LangNodes.finish_message_title_has_update] else Localization[LangNodes.finish_message_title_no_update]
-                val content = if(hasUpdate) Localization[LangNodes.finish_message_content_has_update, "COUNT", "${news.size}"] else Localization[LangNodes.finish_message_content_no_update]
-                JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
+                if (!options.autoExit)
+                {
+                    if (hasUpdate)
+                    {
+                        // 显示所有更新记录
+                        for ((index, vr) in versionRecords.withIndex())
+                        {
+                            val title = vr.first + " (${index + 1} / ${versionRecords.size})"
+                            val content = vr.second.changeLogs.joinToString("\n").trim().ifEmpty { "该版本暂无更新日志" }
+                            JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
+                        }
+                    } else {
+                        val title = Localization[LangNodes.finish_message_title_no_update]
+                        val content = Localization[LangNodes.finish_message_content_no_update]
+                        JOptionPane.showMessageDialog(null, content, title, JOptionPane.INFORMATION_MESSAGE)
+                    }
+                }
             }
         } else {
             val totalUpdated = _diff.newFiles.size + _diff.oldFiles.size

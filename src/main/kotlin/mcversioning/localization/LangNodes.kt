@@ -7,8 +7,6 @@ enum class LangNodes {
     connecting_message,
     fetch_metadata,
     check_local_files,
-    finish_message_title_has_update,
     finish_message_title_no_update,
-    finish_message_content_has_update,
     finish_message_content_no_update
 }

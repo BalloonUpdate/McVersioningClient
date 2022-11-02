@@ -12,6 +12,7 @@ class VersionRecord
     val oldFolders: MutableSet<String> = mutableSetOf()
     val newFolders: MutableSet<String> = mutableSetOf()
     val newFilesLengthes: MutableMap<String, Long> = mutableMapOf()
+    val changeLogs: MutableList<String> = mutableListOf()
 
     constructor()
 
@@ -22,6 +23,7 @@ class VersionRecord
         oldFolders.addAll(jsonObject.getJSONArray("old_folders").map { it as String })
         newFolders.addAll(jsonObject.getJSONArray("new_folders").map { it as String })
         newFilesLengthes.putAll(jsonObject.getJSONObject("new_files_lengthes").toMap() as Map<String, Long>)
+        changeLogs.addAll(jsonObject.optJSONArray("change_logs")?.map { it.toString() } ?: listOf())
     }
 
     fun apply(diff: VersionRecord)
